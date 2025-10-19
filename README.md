@@ -17,7 +17,7 @@
 
 ## Notebook
 
-> Coloque aqui o link para o notebook que implementa a linguagem.
+> você pode conferir sobre a linguagem em [notebock main](main.ipynb)
 
 ## Sintaxe da Linguagem
 

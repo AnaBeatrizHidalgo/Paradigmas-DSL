@@ -1,0 +1,57 @@
+grid:
+  width: 128
+  height: 128
+functions:
+  f1:
+    type: gaussian
+    mean: 0.6
+    sigma: 0.1
+    growth: 1.2
+  f2:
+    type: step
+    threshold: 0.3
+    slope: 10
+kernels:
+  k1:
+    type: square
+    side: 3
+    gaussian_sigma: 1
+    gaussian_kernel_size: 3
+  k2:
+    type: disk
+    radius: 4
+    gaussian_sigma: 0.5
+    gaussian_kernel_size: 7
+lifeforms:
+  predator:
+    color: "red"
+    initial_state: random_discrete
+    rules:
+      hunt:
+        dt: 0.1
+        kernel:
+          ref: k1
+        func:
+          ref: f1
+        weight: 1.0
+
+  prey:
+    color: "blue"
+    initial_state: random_discrete
+    rules:
+      escape:
+        dt: 0.1
+        kernel:
+          ref: k2
+        func:
+          ref: f2
+        weight: 0.8
+
+simulation:
+  dt: 0.1
+  steps: 500
+  seed: 123
+display:
+  window_name: main
+  show_fps: true
+  quit_key: q

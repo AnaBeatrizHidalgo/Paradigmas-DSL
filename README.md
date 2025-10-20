@@ -1,4 +1,4 @@
-# DSL `<Título>`
+# DSL `CellLang`
 
 ## Descrição Resumida da DSL
 
@@ -11,6 +11,8 @@ Além de possibilitar experimentos mais ricos nesse tipo de autômato celular, a
 ## Slides
 
 Link: https://www.canva.com/design/DAG2PleaBzc/cGhrHlZsyY5j5RrFE5_2aQ/edit?utm_content=DAG2PleaBzc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton 
+
+PDF: [Apresentação](Apresentacao_DSL.pdf)
 
 ## Notebook
 
@@ -280,6 +282,17 @@ No estado atual da linguagem, ainda não conseguimos escrever diretamente no .ym
 ## Exemplos Selecionados
 
 > Coloque um conjunto de exemplos selecionados e os resultados alcançados.
+### Exemplo 1
+
+Você pode olhar o resultado da CellLang no arquivo [Exemplo 1](exemplo1.yml)
+
+### Exemplo 2
+
+Você pode olhar o resultado da CellLang no arquivo [Exemplo 2](exemplo2.yml)
+
+### Exemplo 3
+
+Você pode olhar o resultado da CellLang no arquivo [Exemplo 3](exemplo3.yml)
 
 ## Discussão
 

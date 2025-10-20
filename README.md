@@ -1,10 +1,10 @@
-# DSL `CellLang`
+# DSL CellLang
 
 ## Descrição Resumida da DSL
 
-A proposta do projeto é desenvolver uma linguagem capaz de descrever cenários mais complexos do Jogo da Vida, combinando múltiplas formas de vida e incorporando processos dinâmicos avançados por meio de operações e interações entre regras de comportamento. O objetivo é permitir a simulação de sistemas complexos mantendo uma sintaxe simples, expressiva e de fácil aprendizado.
+A proposta do projeto é desenvolver uma linguagem capaz de descrever cenários mais complexos de autômatos celulares, combinando múltiplas formas de vida e incorporando processos dinâmicos avançados por meio de operações e interações entre regras de comportamento. O objetivo é permitir a simulação de sistemas complexos mantendo uma sintaxe simples, expressiva e de fácil aprendizado.
 
-A linguagem é implementada em Guile-Scheme e gera automaticamente um arquivo de configuração no formato .yml, que é então interpretado por um código em Python responsável pela simulação.
+A linguagem é implementada em Guile-Scheme e gera automaticamente um arquivo de configuração no formato .yml, que é então interpretado por um código em Python responsável pela simulação. A escrita do arquivo de configuração yml era complicada, por isso, fez se necessário a criação de uma linguagem facilitadora: O CellLang.
 
 Além de possibilitar experimentos mais ricos nesse tipo de autômato celular, a linguagem busca aproximar temas de biologia e sistemas complexos do público em geral, oferecendo uma interface acessível mesmo a pessoas sem experiência prévia em programação, incentivando a exploração e criação autônoma de novos cenários.
 
@@ -310,7 +310,9 @@ Acreditamos que a principal lição aprendida é que o desenvolvimento da lingua
 
 # Trabalhos Futuros
 
-* Correções na geração do .yml para a geração dos jogos ainda são necessárias, além de que as operações de composição de kernel ainda necessitam 
+* Correções na geração do .yml para a geração dos jogos ainda são necessárias, além de que as operações de composição de kernel ainda necessitam de correção pois apresentam muitos bugs.
+
+* A adição de regras ainda mais complexas facilmente modularizadas, permitindo a criação de outros cenários. Por exemplo: novas operações de mutualismo ou regras diferentes de divisão.
 
 # Testes
 

@@ -1,0 +1,45 @@
+grid:
+  width: 1080
+  height: 720
+
+functions:
+  conway_rules:
+    type: conway
+    underpopulation: 2
+    overpopulation: 3
+    reproduction: 3
+
+kernels:
+  conway_kernel:
+    type: square
+    custom_array: [[1, 1, 1], [1, 0, 1], [1, 1, 1]]
+
+lifeforms:
+  conway:
+    color: "#FF0000"
+    initial_state: random_discrete
+    rules:
+      conway:
+        dt: 1.0
+        kernel:
+          ref: conway_kernel
+        func:
+          ref: conway_rules
+        weight: 1.0
+
+  conway2:
+    color: "#0000FF"
+    initial_state: random_discrete
+    rules:
+      conway2:
+        dt: 1.0
+        kernel:
+          ref: conway_kernel
+        func:
+          ref: conway_rules
+        weight: 1.0
+
+display:
+  window_name: "Conway's Game of Life"
+  quit_key: "q"
+  show_fps: true

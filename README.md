@@ -296,9 +296,7 @@ Você pode olhar o resultado da CellLang no arquivo [Exemplo 3](exemplo3.yml)
 
 ## Discussão
 
-> Discussão dos resultados. Relacionar os resultados com as perguntas de pesquisa ou hipóteses avaliadas.
->
-> A discussão dos resultados também pode ser feita opcionalmente na seção de Resultados, na medida em que os resultados são apresentados. Aspectos importantes a serem discutidos: Por que seu modelo alcançou (ou não) um bom resultado? É possível tirar conclusões dos resultados? Quais? Há indicações de direções para estudo? São necessários trabalhos mais profundos?
+Percebemos que a interação entre formas com regras diferentes pode gerar resultados muito interessantes e muito complexos. Dessa forma, se conseguirmos terminar o CellLang e incrementá-lo de forma a tornar a criação de regras que fazem sentido simples e fácil, teremos uma forma simples de modelar diversos cenários diferentes (sejam reações químicas, interações de seres vivos, queimadas, etc).
 
 ## Conclusão
 

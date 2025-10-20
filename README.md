@@ -297,7 +297,9 @@ Acreditamos que a principal lição aprendida é que o desenvolvimento da lingua
 
 # Trabalhos Futuros
 
-* Correções na geração do .yml para a geração dos jogos ainda são necessárias, além de que as operações de composição de kernel ainda necessitam 
+* Correções na geração do .yml para a geração dos jogos ainda são necessárias, além de que as operações de composição de kernel ainda necessitam de correção pois apresentam muitos bugs.
+
+* A adição de regras ainda mais complexas facilmente modularizadas, permitindo a criação de outros cenários. Por exemplo: novas operações de mutualismo ou regras diferentes de divisão.
 
 # Testes
 

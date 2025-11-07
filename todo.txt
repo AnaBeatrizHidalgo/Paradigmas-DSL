@@ -1,0 +1,8 @@
+* Find a better solution for the window, perhaps create a macro for it. Also add the 
+scale for the window
+
+* Integrate: run the lisp code -> generate the yml -> run the python code 
+
+* Improve the syntax of the language
+
+* Add santanche suggestion of mixing instructions in the top level to generate more complex instructions

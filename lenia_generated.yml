@@ -2,6 +2,14 @@ grid:
   width: 1080
   height: 720
 
+functions:
+  f1:
+    type: gaussian
+    mu: 0.11
+    sigma: 0.08
+    amplitude: 2.0
+    baseline: -1.0
+
 kernels:
   k1:
     type: ring
@@ -22,8 +30,9 @@ kernels:
       type: composite
       operation: divide
       left:
-        ref: k1
-      right: 2
+          ref: k1
+      right:
+          2
 
 lifeforms:
   wanderer:
@@ -35,15 +44,11 @@ lifeforms:
         kernel:
           ref: k2
         func:
-          type: gaussian
-          mu: 0.11
-          sigma: 0.08
-          amplitude: 2.0
-          baseline: -1.0
+          ref: f1
         weight: 1.0
 
 display:
-  window_name: "Simple Lenia"
-  quit_key: "q"
+  window_name: main
   show_fps: true
-  scale: 1.0
+  quit_key: q
+

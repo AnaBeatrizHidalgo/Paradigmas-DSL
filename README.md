@@ -320,6 +320,22 @@ Os .yml gerados ainda não estão no formato necessário para ser consumidos pel
 python yaml_main.py my_config.yml
 ```
 
+# Guia para desenvolvimento
+
+Para facilitar o desenvolvimento recomendo, instale localmente o guile para notebook como
+o tutorial mostra em 
+
+Alternativa mais simples é instalar o guile via um package manager, 
+```bash
+# apt
+apt install guile-3.0
+
+#pacman
+pacman -S guile
+```
+
+e trabalhar em arquivos `.scm`.
+
 # Referências Bibliográficas
 
 - **Lenia**: [Paper by Bert Wang-Chak Chan](https://arxiv.org/abs/1812.05433)

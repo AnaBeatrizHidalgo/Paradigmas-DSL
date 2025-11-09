@@ -1,0 +1,34 @@
+grid:
+  width: 1080
+  height: 720
+
+functions:
+  wireworld_func:
+    type: identity
+
+kernels:
+  wireworld_k:
+    type: ring
+    outer_diameter: 3
+    inner_diameter: 1
+    gaussian_sigma: 0.0
+    gaussian_kernel_size: 1
+
+lifeforms:
+  wireworld:
+    color: "#FFAA00"
+    initial_state: random
+    rules:
+      wireworld:
+        dt: 1
+        kernel:
+          ref: wireworld_k
+        func:
+          ref: wireworld_func
+        weight: 1.0
+
+display:
+  window_name: main
+  show_fps: true
+  quit_key: q
+

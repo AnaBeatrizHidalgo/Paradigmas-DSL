@@ -397,6 +397,11 @@
 (define (show-config cfg)
   (display (config->yaml cfg)))
 
+(define (write-config-to-file cfg filename)
+  (call-with-output-file filename
+    (lambda (out)
+      (display (config->yaml cfg) out))))
+
 
 ;; Display lenia configuration as an example
 
@@ -422,3 +427,8 @@
       (quit q))))
 
 (show-config cfg)
+
+(write-config-to-file cfg "exp1.yml")
+
+;; chama o Python automaticamente
+(system "python3 src/yml_main.py exp1.yml")

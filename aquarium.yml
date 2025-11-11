@@ -1,0 +1,93 @@
+grid:
+  width: 1200
+  height: 800
+
+functions:
+  predator-growth:
+    type: gaussian
+    mu: 0.25
+    sigma: 0.03
+    amplitude: 1.2
+    baseline: -0.5
+  prey-growth:
+    type: gaussian
+    mu: 0.18
+    sigma: 0.05
+    amplitude: 1.5
+    baseline: -0.7
+  algae-growth:
+    type: linear
+    slope: 3.0
+    intercept: -1.0
+
+kernels:
+  small-hunt:
+    type: ring
+    outer_diameter: 18
+    inner_diameter: 10
+    gaussian_sigma: 0.8
+    gaussian_kernel_size: 7
+  wide-sense:
+    type: ring
+    outer_diameter: 35
+    inner_diameter: 20
+    gaussian_sigma: 1.5
+    gaussian_kernel_size: 11
+  diffuse:
+    type: disk
+    radius: 8
+    gaussian_sigma: 2.0
+    gaussian_kernel_size: 9
+  prey-kernel:
+    type: composite
+    operation: add
+    left:
+      ref: wide-sense
+    right:
+      type: composite
+      operation: multiply
+      left:
+          ref: diffuse
+      right:
+          0.4
+
+lifeforms:
+  shark:
+    color: "#FF0000"
+    initial_state: random
+    rules:
+      shark:
+        dt: 0.08
+        kernel:
+          ref: small-hunt
+        func:
+          ref: predator-growth
+        weight: 1.0
+
+  fish:
+    color: "#00AAFF"
+    initial_state: random
+    rules:
+      fish:
+        dt: 0.12
+        kernel:
+          ref: prey-kernel
+        func:
+          ref: prey-growth
+        weight: 1.0
+
+  algae:
+    color: "#00FF44"
+    initial_state: random
+    rules:
+      algae:
+        dt: 0.15
+        kernel:
+          ref: diffuse
+        func:
+          ref: algae-growth
+        weight: 1.0
+
+display:
+  quit_key: q
+

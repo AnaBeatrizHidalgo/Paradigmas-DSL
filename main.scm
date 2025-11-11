@@ -35,22 +35,81 @@
 ;; Hygienic Macros for Declarative Syntax
 
 ;; Main configuration macro - establishes the automaton context
-(define-syntax automaton
-  (syntax-rules (grid functions kernels lifeforms display) ; simulation
-    ((_ (grid w h)
-        (functions f ...)
-        (kernels k ...)
-        (lifeforms l ...)
-        ;(simulation s ...)
-        (display d ...))
+;;(define-syntax automaton
+;;  (syntax-rules (grid functions kernels lifeforms display) ; simulation
+;;    ((_ (grid w h)
+;;        (functions f ...)
+;;        (kernels k ...)
+;;        (lifeforms l ...)
+;;        ;(simulation s ...)
+;;        (display d ...))
+;;     (let ((b (make-config-builder)))
+;;       (begin
+;;         (b 'set-grid! (list (make-pair 'width w) (make-pair 'height h)))
+;;         (begin (b 'add-function! f) ...)
+;;         (begin (b 'add-kernel! k) ...)
+;;         (begin (b 'add-lifeform! l) ...)
+;;         (b 'set-display! (list d ...))
+;;         (b 'build))))))
+
+;; NEW VERSION
+
+(define-syntax CREATE
+  (syntax-rules (AUTOMATON DEFINE FUNCTION KERNEL LIFEFORM ADD GRID CONFIG)
+    ((_ AUTOMATON 
+        (GRID w h)
+        body ...)
      (let ((b (make-config-builder)))
        (begin
          (b 'set-grid! (list (make-pair 'width w) (make-pair 'height h)))
-         (begin (b 'add-function! f) ...)
-         (begin (b 'add-kernel! k) ...)
-         (begin (b 'add-lifeform! l) ...)
-         (b 'set-display! (list d ...))
+         (process-automaton-body b body ...)
          (b 'build))))))
+
+(define-syntax process-automaton-body
+  (syntax-rules (CONFIG DEFINE FUNCTION KERNEL ADD LIFEFORM)
+    ;; Base case - no more clauses
+    ((_ builder)
+     (begin))
+    
+    ((_ builder (CONFIG d) rest ...)
+     (begin
+       (builder 'set-display! (list d))
+       (process-automaton-body builder rest ...)))
+    
+    ((_ builder (DEFINE FUNCTION name def) rest ...)
+     (begin
+       (builder 'add-function! (define-function name def))
+       (process-automaton-body builder rest ...)))
+    
+    ((_ builder (DEFINE KERNEL name (disk radius: r blur: (sigma: s size: sz))) rest ...)
+     (begin
+       (builder 'add-kernel! (list (quote name) 'disk r s sz))
+       (process-automaton-body builder rest ...)))
+    
+    ((_ builder (DEFINE KERNEL name (ring outer: out inner: in blur: (sigma: s size: sz))) rest ...)
+     (begin
+       (builder 'add-kernel! (list (quote name) 'ring out in s sz))
+       (process-automaton-body builder rest ...)))
+    
+    ((_ builder (DEFINE KERNEL name (square side: side blur: (sigma: s size: sz) custom: arr)) rest ...)
+     (begin
+       (builder 'add-kernel! (list (quote name) 'square side s sz arr))
+       (process-automaton-body builder rest ...)))
+    
+    ((_ builder (DEFINE KERNEL name expr) rest ...)
+     (begin
+       (builder 'add-kernel! (kernel-assign (quote name) expr))
+       (process-automaton-body builder rest ...)))
+    
+    ((_ builder (ADD LIFEFORM name props ...) rest ...)
+     (begin
+       (builder 'add-lifeform! (define-lifeform name props ...))
+       (process-automaton-body builder rest ...)))))
+
+
+
+;; END NEW VERSION
+
 
 ;; Function definition macro with pattern matching
 (define-syntax define-function
@@ -137,16 +196,16 @@
   (syntax-rules ()
     ((_ v) (cons 'diffusion v))))
 
-(define-syntax window
+(define-syntax WINDOW
   (syntax-rules ()
     ((_ v) (cons 'window (quote v)))))
-(define-syntax fps
+(define-syntax FPS
   (syntax-rules ()
     ((_ v) (cons 'fps v))))
-(define-syntax quit
+(define-syntax QUIT
   (syntax-rules ()
     ((_ v) (cons 'quit (quote v)))))
-(define-syntax scale
+(define-syntax SCALE
   (syntax-rules ()
     ((_ v) (cons 'scale v))))
 
@@ -405,30 +464,220 @@
 
 ;; Display lenia configuration as an example
 
+;;(define cfg
+;;  (automaton
+;;    (grid 1080 720)
+;;    (functions
+;;      (define-function f1 (gaussian mu: 0.11 sigma: 0.08 amplitude: 2.0 baseline: -1.0)))
+;;    (kernels
+;;      (define-kernel k1 (ring outer: 41 inner: 31 blur: (sigma: 1.1 size: 13)))
+;;      (kernel-assign 'k2 (kernel- 
+;;                          (define-kernel (ring outer: 21 inner: 15 blur: (sigma: 1.2 size: 15))) 
+;;                          (kernel/ 'k1 2))))
+;;    (lifeforms
+;;      (define-lifeform wanderer
+;;        (color: "#00FF88")
+;;        (initial: random)
+;;        (rules:
+;;          (rule wanderer -> (dt: 0.01 kernel: k2 function: f1 weight: 1.0)))))
+;;    (display
+;;      (window main)
+;;      (fps 60)
+;;      (quit q))))
+
 (define cfg
-  (automaton
-    (grid 1080 720)
-    (functions
-      (define-function f1 (gaussian mu: 0.11 sigma: 0.08 amplitude: 2.0 baseline: -1.0)))
-    (kernels
-      (define-kernel k1 (ring outer: 41 inner: 31 blur: (sigma: 1.1 size: 13)))
-      (kernel-assign 'k2 (kernel- 
-                          (define-kernel (ring outer: 21 inner: 15 blur: (sigma: 1.2 size: 15))) 
-                          (kernel/ 'k1 2))))
-    (lifeforms
-      (define-lifeform wanderer
-        (color: "#00FF88")
-        (initial: random)
-        (rules:
-          (rule wanderer -> (dt: 0.01 kernel: k2 function: f1 weight: 1.0)))))
-    (display
-      (window main)
-      (fps 60)
-      (quit q))))
+  (CREATE AUTOMATON
+    (GRID 1080 720)
+    (CONFIG (FPS 60))
+    (CONFIG (WINDOW main))
+    (CONFIG (QUIT q))
+    
+    (DEFINE FUNCTION f1
+      (gaussian mu: 0.11 sigma: 0.08 amplitude: 2.0 baseline: -1.0))
+    
+    (DEFINE KERNEL k1
+      (ring outer: 41 inner: 31 blur: (sigma: 1.1 size: 13)))
+    
+    (DEFINE KERNEL k2
+      (kernel-
+        (define-kernel (ring outer: 21 inner: 15 blur: (sigma: 1.2 size: 15))) 
+        (kernel/ 'k1 2)))
+    
+    (ADD LIFEFORM wanderer
+      (color: "#00FF88")
+      (initial: random)
+      (rules:
+        (rule wanderer -> (dt: 0.01 kernel: k2 function: f1 weight: 1.0))))))
 
-(show-config cfg)
 
-(write-config-to-file cfg "exp1.yml")
+(define nuclei
+  (CREATE AUTOMATON
+    (GRID 1080 720)
+    (CONFIG (FPS 60))
+    (CONFIG (WINDOW main))
+    (CONFIG (QUIT q))
+    
+    (DEFINE FUNCTION f1
+      (gaussian mu: 0.11 sigma: 0.08 amplitude: 2.0 baseline: -1.0))
+
+    (DEFINE FUNCTION f2
+      (gaussian mu: 0.9 sigma: 0.05 amplitude: 2.0 baseline: -1.0))
+    
+    (DEFINE KERNEL k1
+      (ring outer: 41 inner: 31 blur: (sigma: 1.1 size: 13)))
+
+    (DEFINE KERNEL k2
+      (kernel-
+        (define-kernel (ring outer: 21 inner: 15 blur: (sigma: 1.2 size: 15))) 
+        (kernel/ 'k1 2)))
+    
+    (ADD LIFEFORM skin
+      (color: "#28ff9bff")
+      (initial: random)
+      (rules:
+        (rule skin -> (dt: 0.001 kernel: k2 function: f1 weight: 1.0))))
+    
+    (ADD LIFEFORM nucleo
+      (color: "#e3b05eff")
+      (initial: random)
+      (rules:
+        (rule skin -> (dt: 0.001 kernel: k2 function: f2 weight: 1.0))))))
+
+
+(define aquarium
+  (CREATE AUTOMATON
+    (GRID 1200 800)
+    (CONFIG (FPS 45))
+    (CONFIG (WINDOW aquarium))
+    (CONFIG (QUIT q))
+    
+    ;; Growth functions
+    (DEFINE FUNCTION predator-growth
+      (gaussian mu: 0.25 sigma: 0.03 amplitude: 1.2 baseline: -0.5))
+    
+    (DEFINE FUNCTION prey-growth
+      (gaussian mu: 0.18 sigma: 0.05 amplitude: 1.5 baseline: -0.7))
+    
+    (DEFINE FUNCTION algae-growth
+      (linear slope: 3.0 intercept: -1.0))
+    
+    ;; Kernels
+    (DEFINE KERNEL small-hunt
+      (ring outer: 18 inner: 10 blur: (sigma: 0.8 size: 7)))
+    
+    (DEFINE KERNEL wide-sense
+      (ring outer: 35 inner: 20 blur: (sigma: 1.5 size: 11)))
+    
+    (DEFINE KERNEL diffuse
+      (disk radius: 8 blur: (sigma: 2.0 size: 9)))
+    
+    (DEFINE KERNEL prey-kernel
+      (kernel+ 'wide-sense (kernel* 'diffuse 0.4)))
+    
+    ;; Species
+    (ADD LIFEFORM shark
+      (color: "#FF0000")
+      (initial: random)
+      (rules:
+        (rule shark -> (dt: 0.08 kernel: small-hunt function: predator-growth weight: 1.0))))
+    
+    (ADD LIFEFORM fish
+      (color: "#00AAFF")
+      (initial: random)
+      (rules:
+        (rule fish -> (dt: 0.12 kernel: prey-kernel function: prey-growth weight: 1.0))))
+    
+    (ADD LIFEFORM algae
+      (color: "#00FF44")
+      (initial: random)
+      (rules:
+        (rule algae -> (dt: 0.15 kernel: diffuse function: algae-growth weight: 1.0))))))
+
+
+;; ============================================================
+;; 8C. LAVA LAMP v3 - Smooth buoyant blobs (stable version)
+;; ============================================================
+(define lava-lamp
+  (CREATE AUTOMATON
+    (GRID 500 900)
+    (CONFIG (FPS 60))
+    (CONFIG (WINDOW lava-lamp-v3))
+    (CONFIG (QUIT q))
+    
+    ;; ========================================================
+    ;; FUNCTIONS
+    ;; ========================================================
+
+    ;; Blob cohesion — keeps forms together
+    (DEFINE FUNCTION cohesion
+      (gaussian mu: 0.18 sigma: 0.045 amplitude: 2.0 baseline: -1.0))
+    
+    ;; Surface tension for smooth edges
+    (DEFINE FUNCTION tension
+      (gaussian mu: 0.23 sigma: 0.06 amplitude: 1.2 baseline: -0.4))
+    
+    ;; Upward buoyancy — slow lift
+    (DEFINE FUNCTION buoyancy
+      (gaussian mu: 0.15 sigma: 0.03 amplitude: 1.6 baseline: -0.7))
+    
+    ;; Gentle gravity (downward bias)
+    (DEFINE FUNCTION gravity
+      (gaussian mu: 0.32 sigma: 0.06 amplitude: -0.6 baseline: 0.3))
+    
+    ;; Damping for long-term stability
+    (DEFINE FUNCTION diffusion
+      (linear slope: -0.4 intercept: 0.3))
+
+    ;; ========================================================
+    ;; KERNELS
+    ;; ========================================================
+
+    (DEFINE KERNEL core
+      (disk radius: 16 blur: (sigma: 2.0 size: 9)))
+    
+    (DEFINE KERNEL shell
+      (ring outer: 28 inner: 16 blur: (sigma: 1.8 size: 11)))
+    
+    (DEFINE KERNEL ambient
+      (ring outer: 45 inner: 25 blur: (sigma: 2.5 size: 15)))
+    
+    ;; Nested kernel combination (binary-safe)
+    (DEFINE KERNEL blob-field
+      (kernel+ 
+        (kernel+ 
+          (kernel* 'core 1.0)
+          (kernel* 'shell 0.7))
+        (kernel* 'ambient -0.3)))
+
+    ;; ========================================================
+    ;; LIFEFORM
+    ;; ========================================================
+
+    (ADD LIFEFORM blob
+      (color: "#FF8844")
+      (initial: random)
+      (rules:
+        ;; Cohesion and surface tension
+        (rule blob -> (dt: 0.10 kernel: blob-field function: cohesion weight: 1.0))
+        (rule blob -> (dt: 0.08 kernel: shell function: tension weight: 0.8))
+        
+        ;; Smooth upward drift
+        (rule blob -> (dt: 0.12 kernel: ambient function: buoyancy weight: 0.5))
+        
+        ;; Occasional slow settling
+        (rule blob -> (dt: 0.25 kernel: ambient function: gravity weight: 0.3))
+        
+        ;; Global damping
+        (rule blob -> (dt: 0.04 kernel: ambient function: diffusion weight: 0.3))))))
+
+
+
+(show-config lava-lamp)
+
+(write-config-to-file cfg2 "cfg2.yml")
+(write-config-to-file nuclei "nuclei.yml")
+(write-config-to-file aquarium "aquarium.yml")
+(write-config-to-file lava-lamp "lava-lamp.yml")
 
 ;; chama o Python automaticamente
-(system "python3 src/yml_main.py exp1.yml")
+(system "python3 src/yml_main.py nuclei.yml")

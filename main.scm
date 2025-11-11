@@ -461,29 +461,10 @@
     (lambda (out)
       (display (config->yaml cfg) out))))
 
-
-;; Display lenia configuration as an example
-
-;;(define cfg
-;;  (automaton
-;;    (grid 1080 720)
-;;    (functions
-;;      (define-function f1 (gaussian mu: 0.11 sigma: 0.08 amplitude: 2.0 baseline: -1.0)))
-;;    (kernels
-;;      (define-kernel k1 (ring outer: 41 inner: 31 blur: (sigma: 1.1 size: 13)))
-;;      (kernel-assign 'k2 (kernel- 
-;;                          (define-kernel (ring outer: 21 inner: 15 blur: (sigma: 1.2 size: 15))) 
-;;                          (kernel/ 'k1 2))))
-;;    (lifeforms
-;;      (define-lifeform wanderer
-;;        (color: "#00FF88")
-;;        (initial: random)
-;;        (rules:
-;;          (rule wanderer -> (dt: 0.01 kernel: k2 function: f1 weight: 1.0)))))
-;;    (display
-;;      (window main)
-;;      (fps 60)
-;;      (quit q))))
+(define (run-simulation cfg)
+  (write-config-to-file cfg "temp.yml")
+  (system "python3 src/yml_main.py temp.yml")
+  (system "rm temp.yml"))
 
 (define cfg
   (CREATE AUTOMATON
@@ -671,13 +652,13 @@
         (rule blob -> (dt: 0.04 kernel: ambient function: diffusion weight: 0.3))))))
 
 
+; Example for printing the configuration
+; (show-config lava-lamp)
+; 
+; Example for writing the .yml
+; (write-config-to-file nuclei "nuclei.yml")
+; (write-config-to-file aquarium "aquarium.yml")
+; (write-config-to-file lava-lamp "lava-lamp.yml")
 
-(show-config lava-lamp)
-
-(write-config-to-file cfg2 "cfg2.yml")
-(write-config-to-file nuclei "nuclei.yml")
-(write-config-to-file aquarium "aquarium.yml")
-(write-config-to-file lava-lamp "lava-lamp.yml")
-
-;; chama o Python automaticamente
-(system "python3 src/yml_main.py nuclei.yml")
+;; Roda a simulaçao definida pela configuração
+(run-simulation nuclei)

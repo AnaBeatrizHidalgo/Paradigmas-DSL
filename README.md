@@ -18,6 +18,8 @@ PDF: [Apresentação](Apresentacao_DSL.pdf)
 
 Confira a linguagem e exemplos de uso em [notebock main](main.ipynb)
 
+Aqui está a sintaxe do README atualizada para refletir o novo código, mantendo o formato e a especificidade da versão anterior.
+
 ## Sintaxe da Linguagem
 
 ### 1. Estrutura principal
@@ -25,127 +27,169 @@ Confira a linguagem e exemplos de uso em [notebock main](main.ipynb)
 #### Sintaxe geral
 
 ```scheme
-(automaton
-  (grid <width> <height>)
-  (functions <function-definition> ...)
-  (kernels <kernel-definition> ...)
-  (lifeforms <lifeform-definition> ...)
-  (simulation <simulation-parameter> ...)
-  (display <display-parameter> ...))
+(CREATE AUTOMATON
+  (GRID <width> <height>)
+  
+  ;; Definições de Configuração
+  (CONFIG <display-parameter>)
+  ...
+  
+  ;; Definições de Funções
+  (DEFINE FUNCTION <nome-funcao> <function-definition>)
+  ...
+  
+  ;; Definições de Kernels
+  (DEFINE KERNEL <nome-kernel> <kernel-definition>)
+  ...
+  
+  ;; Definições de Formas de Vida
+  (ADD LIFEFORM <nome-lifeform>
+    <lifeform-properties> ...)
+  ...)
+
+;; Comando de execução
+(run-simulation <automaton-definition>)
 ```
 
-O bloco `automaton` define **todo o contexto** de um autômato celular.
-Cada subbloco (`grid`, `functions`, `kernels`, etc.) é obrigatório e deve seguir as formas descritas abaixo.
+O bloco `CREATE AUTOMATON` define **todo o contexto** de um autômato celular.
 
----
+  * O `GRID` é obrigatório e define o tamanho do autômato.
+  * Os blocos `CONFIG`, `DEFINE FUNCTION`, `DEFINE KERNEL` e `ADD LIFEFORM` podem aparecer em qualquer ordem e substituem os antigos blocos agrupadores (`functions`, `kernels`, etc.).
 
-### 2. Configuração da Grade (`grid`)
+-----
+
+### 2\. Configuração da Grade (`GRID`)
 
 #### Sintaxe
 
 ```scheme
-(grid <width> <height>)
+(CREATE AUTOMATON
+  (GRID <width> <height>)
+  ...)
 ```
 
 ### Descrição
 
-Define as dimensões da grade onde o autômato evolui.
+Define as dimensões da grade onde o autômato evolui. Esta é a **primeira expressão** dentro do `CREATE AUTOMATON`.
 
 | Parâmetro | Tipo    | Descrição        |
 | --------- | ------- | ---------------- |
 | `width`   | inteiro | Largura da grade |
 | `height`  | inteiro | Altura da grade  |
 
----
+-----
 
-### 3. Definição de Funções (`define-function`)
+### 3\. Definição de Funções (`DEFINE FUNCTION`)
 
 As funções descrevem transformações contínuas ou discretas aplicadas às células.
-Cada função recebe um **nome** e uma **configuração de parâmetros nomeados**.
+Cada função é definida no escopo principal do `CREATE AUTOMATON`.
 
 #### Sintaxe geral
 
 ```scheme
-(define-function <nome> (<tipo> <parametros> ...))
+(DEFINE FUNCTION <nome> (<tipo> <parametros> ...))
 ```
 
 #### Tipos suportados e suas formas
 
-| Tipo         | Forma                                         | Descrição                            |
-| ------------ | --------------------------------------------- | ------------------------------------ |
-| `gaussian`   | `(gaussian mean: <m> sigma: <s> growth: <g>)` | Função gaussiana                     |
-| `step`       | `(step threshold: <t> slope: <a>)`            | Função degrau suave                  |
-| `lenia`      | `(lenia mu: <m> sigma: <s> beta: <b>)`        | Função típica de Lenia               |
-| `regression` | `(regression a: <a> b: <b> c: <c>)`           | Polinômio de regressão de ordem 2    |
-| `sigmoid`    | `(sigmoid k: <k> x0: <x0>)`                   | Função sigmoide                      |
-| `tanh`       | `(tanh scale: <s> bias: <b>)`                 | Função tangente hiperbólica escalada |
+| Tipo         | Forma                                                                  | Descrição                                 |
+| ------------ | ---------------------------------------------------------------------- | ----------------------------------------- |
+| `gaussian`   | `(gaussian mu: <m> sigma: <s> amplitude: <amp> baseline: <base>)`      | Função gaussiana                          |
+| `step`       | `(step threshold: <t> low_value: <lv> high_value: <hv>)`               | Função degrau                             |
+| `linear`     | `(linear slope: <sl> intercept: <int>)`                                | Função linear (ax + b)                    |
+| `conway`     | `(conway underpopulation: <und> overpopulation: <over> reproduction:<r>)` | Regras discretas de Conway (Game of Life) |
+| `identity`   | `(identity)`                                                           | Função identidade (retorna a entrada)     |
 
 #### Exemplo
 
 ```scheme
-(define-function f1 (gaussian mean: 0.3 sigma: 0.05 growth: 1.0))
-(define-function f2 (step threshold: 0.2 slope: 5))
+(CREATE AUTOMATON
+  (GRID 100 100)
+  (DEFINE FUNCTION f1 (gaussian mu: 0.3 sigma: 0.05 amplitude: 1.0 baseline: 0.0))
+  (DEFINE FUNCTION f2 (step threshold: 0.2 low_value: 0.0 high_value: 1.0))
+  ...)
 ```
 
----
+-----
 
-### 4. Definição de Núcleos (`define-kernel`)
+### 4\. Definição de Núcleos (`DEFINE KERNEL`)
 
 Kernels representam vizinhanças espaciais ou filtros usados para convolução.
+São definidos no escopo principal do `CREATE AUTOMATON`.
 
 #### Sintaxe geral
 
 ```scheme
-(define-kernel <nome> (<tipo> <parametros> ...))
+(DEFINE KERNEL <nome> (<tipo> <parametros> ...))
 ```
 
 #### Tipos suportados
 
-| Tipo                              | Forma                                                               | Descrição                       |
-| --------------------------------- | ------------------------------------------------------------------- | ------------------------------- |
-| `disk`                            | `(disk radius: <r> blur: (sigma: <s> size: <sz>))`                  | Disco gaussiano                 |
-| `ring`                            | `(ring outer: <out> inner: <in> blur: (sigma: <s> size: <sz>))`     | Anel difuso                     |
-| `square`                          | `(square side: <side> blur: (sigma: <s> size: <sz>))`               | Quadrado gaussiano              |
-| `square` (com matriz customizada) | `(square side: <side> blur: (sigma: <s> size: <sz>) custom: <arr>)` | Quadrado com filtro customizado |
+| Tipo     | Forma                                                              | Descrição                     |
+| -------- | ------------------------------------------------------------------ | ----------------------------- |
+| `disk`   | `(disk radius: <r> blur: (sigma: <s> size: <sz>))`                 | Disco gaussiano               |
+| `ring`   | `(ring outer: <out> inner: <in> blur: (sigma: <s> size: <sz>))`    | Anel difuso                   |
+| `square` | `(square side: <side> blur: (sigma: <s> size: <sz>) custom: <arr>)` | Quadrado (com filtro opcional) |
+
+*Nota: O parâmetro `custom: <arr>` no `square` é opcional.*
 
 #### Exemplo
 
 ```scheme
-(define-kernel k1 (disk radius: 5 blur: (sigma: 1.5 size: 9)))
-(define-kernel k2 (ring outer: 6 inner: 2 blur: (sigma: 2 size: 11)))
+(CREATE AUTOMATON
+  (GRID 100 100)
+  (DEFINE KERNEL k1 (disk radius: 5 blur: (sigma: 1.5 size: 9)))
+  (DEFINE KERNEL k2 (ring outer: 6 inner: 2 blur: (sigma: 2 size: 11)))
+  ...)
 ```
 
----
+-----
 
-### 5. Combinadores de Kernels
+### 5\. Combinadores de Kernels
 
-Operações de composição de kernels:
+Operações de composição de kernels. Elas são usadas como a definição de um `DEFINE KERNEL`.
 
-| Operador            | Descrição                                |
-| ------------------- | ---------------------------------------- |
-| `(kernel+ k1 k2)`   | Soma dois kernels                        |
-| `(kernel- k1 k2)`   | Subtrai                                  |
-| `(kernel* k1 k2)`   | Multiplica ponto a ponto                 |
-| `(kernel/ k1 k2)`   | Divide ponto a ponto                     |
-| `(scale-kernel c)`  | Retorna função que escala kernel por `c` |
-| `(kernel-ref nome)` | Referência a kernel nomeado              |
+| Operador          | Descrição                        |
+| ----------------- | -------------------------------- |
+| `(kernel+ k1 k2)` | Soma dois kernels                |
+| `(kernel- k1 k2)` | Subtrai (k1 - k2)                |
+| `(kernel* k1 k2)` | Multiplica ponto a ponto         |
+| `(kernel/ k1 k2)` | Divide ponto a ponto (k1 / k2)   |
+| `(scale-kernel c)`| Retorna função que escala kernel por `c` |
+| `'<nome>`         | Referência a kernel nomeado      |
+
+*Nota: `k1` e `k2` podem ser referências (ex: `'k1`) ou definições de kernel inline (ex: `(define-kernel (disk ...))`).*
 
 #### Exemplo
 
 ```scheme
-(define combined (kernel+ (kernel-ref k1) (kernel-ref k2)))
+(CREATE AUTOMATON
+  (GRID 100 100)
+  (DEFINE KERNEL k1 (disk radius: 5 blur: (sigma: 1.5 size: 9)))
+  (DEFINE KERNEL k2 (ring outer: 6 inner: 2 blur: (sigma: 2 size: 11)))
+  
+  ;; k3 é a soma de k1 e k2
+  (DEFINE KERNEL k3 (kernel+ 'k1 'k2))
+
+  ;; k4 é uma combinação complexa
+  (DEFINE KERNEL k4
+    (kernel-
+      (define-kernel (ring outer: 21 inner: 15 blur: (sigma: 1.2 size: 15))) 
+      (kernel/ 'k1 2)))
+  ...)
 ```
 
----
+-----
 
-### 6. Definição de Formas de Vida (`define-lifeform`)
+### 6\. Definição de Formas de Vida (`ADD LIFEFORM`)
 
 As **lifeforms** são entidades vivas com estado inicial, cor e regras de evolução.
+São definidas no escopo principal do `CREATE AUTOMATON`.
 
 #### Sintaxe
 
 ```scheme
-(define-lifeform <nome>
+(ADD LIFEFORM <nome>
   (color: <cor>)
   (initial: <inicialização>)
   (rules: <regra> ...))
@@ -159,124 +203,137 @@ Cada `rule` segue a forma:
 (rule <alvo> -> (dt: <Δt> kernel: <kernel> function: <função> weight: <peso>))
 ```
 
-| Campo      | Descrição                     |
-| ---------- | ----------------------------- |
-| `alvo`     | Nome da variável/camada alvo  |
-| `dt`       | Passo temporal                |
-| `kernel`   | Kernel usado na convolução    |
-| `function` | Função usada na transformação |
-| `weight`   | Peso multiplicativo           |
+| Campo      | Descrição                                    |
+| ---------- | -------------------------------------------- |
+| `alvo`     | Nome da variável/camada alvo (geralmente o nome da própria lifeform) |
+| `dt`       | Passo temporal da regra                      |
+| `kernel`   | Nome (símbolo) do kernel a ser usado         |
+| `function` | Nome (símbolo) da função a ser usada         |
+| `weight`   | Peso multiplicativo da regra                 |
 
 #### Exemplo
 
 ```scheme
-(define-lifeform amoeba
-  (color: "blue")
-  (initial: seed)
-  (rules:
-    (rule density -> (dt: 0.1 kernel: k1 function: f1 weight: 1.0))
-    (rule energy -> (dt: 0.05 kernel: k2 function: f2 weight: 0.8))))
+(CREATE AUTOMATON
+  (GRID 100 100)
+  (DEFINE FUNCTION f1 ...)
+  (DEFINE KERNEL k1 ...)
+  
+  (ADD LIFEFORM amoeba
+    (color: "#00FF88")
+    (initial: random)
+    (rules:
+      (rule amoeba -> (dt: 0.01 kernel: k1 function: f1 weight: 1.0))
+      (rule amoeba -> (dt: 0.05 kernel: k2 function: f2 weight: 0.8))))
+  ...)
 ```
 
----
+-----
 
-### 7. Parâmetros de Simulação (`simulation`)
+### 7\. Parâmetros de Configuração (`CONFIG`)
 
-Define parâmetros globais do sistema dinâmico.
+Controla a renderização e outros parâmetros globais. Substitui o antigo bloco `display` (e `simulation`).
+Múltiplas cláusulas `CONFIG` podem ser usadas.
 
 #### Sintaxe
 
-Cada parâmetro é um par nome-valor com macro específica:
+Cada parâmetro é uma macro específica dentro de um `(CONFIG ...)`:
 
-| Macro             | Descrição                 |
-| ----------------- | ------------------------- |
-| `(dt <v>)`        | Passo de tempo            |
-| `(steps <n>)`     | Número total de iterações |
-| `(seed <n>)`      | Semente de aleatoriedade  |
-| `(diffusion <v>)` | Taxa de difusão           |
+| Macro                     | Descrição                             |
+| ------------------------- | --------------------------------------- |
+| `(WINDOW <identificador>)`| Nome da janela (símbolo)                |
+| `(FPS <valor>)`           | Taxa de atualização (quadros por segundo) |
+| `(SCALE <valor>)`         | Escala do zoom da grade (inteiro)       |
+| `(QUIT <tecla>)`          | Tecla de saída (símbolo, ex: `q`)       |
 
 #### Exemplo
 
 ```scheme
-(simulation
-  (dt 0.1)
-  (steps 10000)
-  (seed 42)
-  (diffusion 0.2))
+(CREATE AUTOMATON
+  (GRID 100 100)
+  (CONFIG (WINDOW main))
+  (CONFIG (FPS 60))
+  (CONFIG (SCALE 2))
+  (CONFIG (QUIT q))
+  ...)
 ```
 
----
+-----
 
-### 8. Parâmetros de Exibição (`display`)
+### 8\. Execução e Saída
 
-Controla a renderização do autômato.
+Funções usadas fora do bloco `CREATE AUTOMATON` para inspecionar ou executar a configuração.
 
 #### Sintaxe
 
-| Macro                      | Descrição                                 |
-| -------------------------- | ----------------------------------------- |
-| `(window <identificador>)` | Nome da janela                            |
-| `(fps <valor>)`            | Taxa de atualização (quadros por segundo) |
-| `(scale <valor>)`          | Escala do zoom da grade                   |
-| `(quit <tecla>)`           | Tecla de saída                            |
+| Função                         | Descrição                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------ |
+| `(show-config <cfg>)`          | Imprime a configuração YAML resultante no console.                             |
+| `(write-config-to-file <cfg> <arquivo>)` | Salva a configuração YAML em `<arquivo>`.                             |
+| `(run-simulation <cfg>)`       | **Comando principal:** Salva a config em `temp.yml` e executa o simulador Python. |
+
+*Onde `<cfg>` é a variável que armazena o resultado da macro `CREATE AUTOMATON`.*
 
 #### Exemplo
 
 ```scheme
-(display
-  (window main)
-  (fps 60)
-  (scale 2)
-  (quit q))
+(define my-automaton
+  (CREATE AUTOMATON
+    (GRID 100 100)
+    ...
+  ))
+
+;; Apenas imprime o YAML
+(show-config my-automaton)
+
+;; Salva o YAML
+(write-config-to-file my-automaton "meu_automato.yml")
+
+;; Executa a simulação
+(run-simulation my-automaton)
 ```
 
----
+-----
 
-### 9. Ver a configuração (show-config)
-
-No estado atual da linguagem, ainda não conseguimos escrever diretamente no .yml ou criar o .yml, então temos uma função que imprime a configuração no formato do .yml 
-
-#### Sintaxe
-
-| Parâmetro                  | Descrição                                 |
-| -------------------------- | ----------------------------------------- |
-| `(config)`                 | Confifuração do automato                  |
-
-#### Exemplo
+### 9\. Exemplo na linguagem
 
 ```scheme
-(show-config cfg)
-```
+;; Define a configuração do autômato 'nuclei'
+(define nuclei
+  (CREATE AUTOMATON
+    (GRID 1080 720)
+    (CONFIG (FPS 60))
+    (CONFIG (WINDOW main))
+    (CONFIG (QUIT q))
+    
+    (DEFINE FUNCTION f1
+      (gaussian mu: 0.11 sigma: 0.08 amplitude: 2.0 baseline: -1.0))
 
-### 10. Exemplo na linguagem
+    (DEFINE FUNCTION f2
+      (gaussian mu: 0.9 sigma: 0.05 amplitude: 2.0 baseline: -1.0))
+    
+    (DEFINE KERNEL k1
+      (ring outer: 41 inner: 31 blur: (sigma: 1.1 size: 13)))
 
-```scheme
-(automaton
-  (grid 128 128)
-  (functions
-    (define-function f1 (gaussian mean: 0.3 sigma: 0.05 growth: 1.0))
-    (define-function f2 (step threshold: 0.2 slope: 5)))
-  (kernels
-    (define-kernel k1 (disk radius: 5 blur: (sigma: 1.5 size: 9)))
-    (define-kernel k2 (ring outer: 6 inner: 2 blur: (sigma: 2 size: 11))))
-  (lifeforms
-    (define-lifeform amoeba
-      (color: "green")
-      (initial: seed)
+    (DEFINE KERNEL k2
+      (kernel-
+        (define-kernel (ring outer: 21 inner: 15 blur: (sigma: 1.2 size: 15))) 
+        (kernel/ 'k1 2)))
+    
+    (ADD LIFEFORM skin
+      (color: "#28ff9bff")
+      (initial: random)
       (rules:
-        (rule density -> (dt: 0.1 kernel: k1 function: f1 weight: 1.0))
-        (rule energy -> (dt: 0.05 kernel: k2 function: f2 weight: 0.8)))))
-  (simulation
-    (dt 0.1)
-    (steps 5000)
-    (seed 42))
-  (display
-    (window main)
-    (fps 60)
-    (scale 2)
-    (quit q)))
+        (rule skin -> (dt: 0.001 kernel: k2 function: f1 weight: 1.0))))
+    
+    (ADD LIFEFORM nucleo
+      (color: "#e3b05eff")
+      (initial: random)
+      (rules:
+        (rule skin -> (dt: 0.001 kernel: k2 function: f2 weight: 1.0))))))
 
-(show-config automaton)
+;; Executa a simulação
+(run-simulation nuclei)
 ```
 
 ## Exemplos Selecionados

@@ -522,7 +522,7 @@
       (color: "#e3b05eff")
       (initial: random)
       (rules:
-        (rule skin -> (dt: 0.001 kernel: k2 function: f2 weight: 1.0))))))
+        (rule nucleo -> (dt: 0.001 kernel: k2 function: f2 weight: 1.0))))))
 
 
 (define aquarium

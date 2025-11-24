@@ -1,0 +1,70 @@
+grid:
+  width: 1080
+  height: 720
+
+functions:
+  f1:
+    type: gaussian
+    mu: 0.11
+    sigma: 0.08
+    amplitude: 2.0
+    baseline: -1.0
+  f2:
+    type: gaussian
+    mu: 0.9
+    sigma: 0.05
+    amplitude: 2.0
+    baseline: -1.0
+
+kernels:
+  k1:
+    type: ring
+    outer_diameter: 41
+    inner_diameter: 31
+    gaussian_sigma: 1.1
+    gaussian_kernel_size: 13
+  k2:
+    type: composite
+    operation: subtract
+    left:
+      type: ring
+      outer_diameter: 21
+      inner_diameter: 15
+      gaussian_sigma: 1.2
+      gaussian_kernel_size: 15
+    right:
+      type: composite
+      operation: divide
+      left:
+          ref: k1
+      right:
+          2
+
+lifeforms:
+  wanderer:
+    color: "#28ff9bff"
+    initial_state: random
+    rules:
+      wanderer:
+        dt: 0.001
+        kernel:
+          ref: k2
+        func:
+          ref: f1
+        weight: 1.0
+
+  splash:
+    color: "#e3b05eff"
+    initial_state: random
+    rules:
+      wanderer:
+        dt: 0.001
+        kernel:
+          ref: k2
+        func:
+          ref: f2
+        weight: 1.0
+
+display:
+  quit_key: q
+

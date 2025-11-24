@@ -1,0 +1,35 @@
+grid:
+  width: 1080
+  height: 720
+
+functions:
+  gh-rule:
+    type: linear
+    slope: 1
+    intercept: -1.0
+
+kernels:
+  gh-k:
+    type: disk
+    radius: 1
+    gaussian_sigma: 0.2
+    gaussian_kernel_size: 5
+
+lifeforms:
+  greenberg-hastings:
+    color: "#33FF55"
+    initial_state: random_discrete
+    rules:
+      greenberg-hastings:
+        dt: 0.01
+        kernel:
+          ref: gh-k
+        func:
+          ref: gh-rule
+        weight: 1
+
+display:
+  window_name: main
+  show_fps: true
+  quit_key: q
+

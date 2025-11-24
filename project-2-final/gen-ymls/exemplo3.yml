@@ -1,0 +1,46 @@
+grid:
+  width: 64
+  height: 64
+functions:
+  conway_rules:
+    type: conway
+kernels:
+  conway_kernel:
+    type: square
+    side: 
+    gaussian_sigma: 
+    gaussian_kernel_size: 
+    custom_array: "[[1 1 1] [1 0 1] [1 1 1]]"
+lifeforms:
+  conway:
+    color: "red"
+    initial_state: random_discrete
+    rules:
+      conway:
+        dt: 1.0
+        kernel:
+          ref: conway_kernel
+        func:
+          ref: conway_rules
+        weight: 1.0
+
+  conway2:
+    color: "blue"
+    initial_state: random_discrete
+    rules:
+      conway2:
+        dt: 1.0
+        kernel:
+          ref: conway_kernel
+        func:
+          ref: conway_rules
+        weight: 1.0
+
+simulation:
+  dt: 1.0
+  steps: 500
+  seed: 42
+display:
+  window_name: main
+  show_fps: true
+  quit_key: q

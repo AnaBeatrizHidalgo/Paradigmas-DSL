@@ -16,7 +16,7 @@ PDF: [Apresentação](Apresentacao_DSL.pdf)
 
 ## Notebook
 
-Confira a linguagem e exemplos de uso em [notebock main](main.ipynb)
+Confira a linguagem e exemplos de uso em [notebook main](main.ipynb)
 
 Aqui está a sintaxe do README atualizada para refletir o novo código, mantendo o formato e a especificidade da versão anterior.
 
